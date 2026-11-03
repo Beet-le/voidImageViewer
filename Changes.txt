@@ -50,7 +50,7 @@ Thursday, 22 May 2025: Version 1.0.0.9
 	added maximized options
 	added option to copy image
 	added option to copy filename
-	added new code signing certificate: voidtools PTY LTD
+	added new code signing certificate
 	improved animation timings
 
 Wednesday, 11 October 2017: Version 1.0.0.8b
@@ -73,7 +73,7 @@ Thursday, 14 September 2017: Version 1.0.0.6b
 	added everything search
 	added shuffle
 	fixed /dc command line option
-	fixed a bug when opening void image viewer and getting a random filename
+	fixed a bug when opening Spring Image Viewer and getting a random filename
 	
 Thursday, 31 August 2017: Version 1.0.0.5b
 	fixed a bug with move to/copy to

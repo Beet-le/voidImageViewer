@@ -1,5 +1,5 @@
 //
-// Copyright 2025 voidtools / David Carpenter
+// Copyright 2025
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -19,7 +19,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-// VoidImageViewer
+// SpringImageViewer
 
 // TODO:
 // right click rename 
@@ -82,7 +82,7 @@
 // Check we are using ICC
 // show main window on monitor that the cursor is currently on, like MPC-HC.
 // remove GetFileAttributesEx or replace with GetFileAttributes..
-// Ctrl + V to paste image from the clipboard into voidImageViewer??
+// Ctrl + V to paste image from the clipboard into SpringImageViewer??
 // a touch window from inside option
 // add support for APNG
 // A Play All Instances option that plays/pause all instances
@@ -94,7 +94,7 @@
 // graphics::GetHalftonePalette for 256 color mode.
 // high dpi icons
 // control toolbar customization
-// install bmp/jpg only if the default value for HKEY_CLASSES_ROOT\.bmp is bmpfile or voidImageViewer.bmpfile -don't replace non default ones. default hard to determine for each version of Windows -avoiding for now.
+// install bmp/jpg only if the default value for HKEY_CLASSES_ROOT\.bmp is bmpfile or SpringImageViewer.bmpfile -don't replace non default ones. default hard to determine for each version of Windows -avoiding for now.
 // string table for localization.
 // right click -> open with ...open with, or rather get a proper context menu. CDefFolderMenu_Create2
 // keep window aspect size option
@@ -103,7 +103,7 @@
 // shift + Ctrl + Numpad arrow keys for faster/slower movement
 // when panning the image, clamp to the image edge, instead of the image center.
 // paste dib from clipboard CF_DIB
-// therube: Just to note...  Something like: voidImageViewer.exe "\my documents" or voidImageViewer.exe "\my documents\"  , will load "images" found in the \my documents\ directory.  Though somethig like: voidImageViewer.exe "\my documents\*" or voidImageViewer.exe "\my documents\*.*"  will load (I suppose it is) ALL images on your computer. voidImageViewer.exe "\my documents\*.jpg" works as expected. 
+// therube: Just to note...  Something like: SpringImageViewer.exe "\my documents" or SpringImageViewer.exe "\my documents\"  , will load "images" found in the \my documents\ directory.  Though somethig like: SpringImageViewer.exe "\my documents\*" or SpringImageViewer.exe "\my documents\*.*"  will load (I suppose it is) ALL images on your computer. SpringImageViewer.exe "\my documents\*.jpg" works as expected. 
 // maintain correct image aspect ratio when window is clipped on auto size.
 //
 // DONE:
@@ -142,7 +142,7 @@
 // *Open Location of file (Show in Explorer).
 // *Clear ΓÇô This command needs a Hotkey (Maybe Crtl+W like in Word), and Dialog Box to approve. -added as close ctrl + W
 // *Write the Dimensions (weight height) of each pic and the speed of animation.
-// *Voidimageviewer has a nice feature of controlling the animation rate (speed), to make it fast/slower.
+// *SpringImageViewer has a nice feature of controlling the animation rate (speed), to make it fast/slower.
 // *open clipboard to view image in clipboard? -no must be file based for now
 // *Mousewheel up/down ΓÇô Most of image viewers use these keys for one of two actions: 1. Next image / Previous image 2. Zoom in / Zoom out -keyboard shortcut to toggle between the two.
 // *print -using preview to print ..
@@ -228,7 +228,7 @@
 // *correct tracking of center pixel when zooming/resizing.
 // *when going full screen, check if the image is currently smaller than it would be full screen, if it is, set a flag to restore the zoom, save the zoom and set the zoom to 0.
 // *D:\Misc\Game Data\Aladdin\Aladdin-RugRide.png doesn't render correctly on some zooms 85129x224 -converted int to __int64
-// *check the viv icon is being used for webp. -it does, but you have to open a webp file first and allow voidimageviewer to open.
+// *check the viv icon is being used for webp. -it does, but you have to open a webp file first and allow SpringImageViewer to open.
 // *prevent screen saver on slideshow
 // 1.0.0.15
 // *fixed _viv_dst_pos_x/_viv_dst_pos_y (doubled offsets to match mpchc)
@@ -456,6 +456,7 @@ static void _viv_command(int command);
 static int _viv_process_install_command_line_options(wchar_t *cl);
 static void _viv_process_command_line(wchar_t *cl);
 static int _viv_init(int nCmdShow);
+static void _viv_check_default_association(void);
 static void _viv_kill(void);
 static void _viv_exit(void);
 static int _viv_next(int prev,int reset_slideshow_timer,int is_preload,int wait_for_current_load);
@@ -4510,7 +4511,7 @@ static int _viv_process_install_command_line_options(wchar_t *cl)
 		bufstart = buf;
 		
 		// treat switches with a '.' as a filename.
-		// eg: voidimageviewer.exe -my-image.png
+		// eg: SpringImageViewer.exe -my-image.png
 		if ((!was_quote) && ((*bufstart == '/') || (*bufstart == '-')) && (!string_is_dot(buf)))
 		{
 			bufstart++;
@@ -4541,7 +4542,7 @@ static int _viv_process_install_command_line_options(wchar_t *cl)
 				// no uninstall path?
 				if (!uninstall_path[0])	
 				{
-					// caller will need to manually delete voidimageviewer.exe
+					// caller will need to manually delete SpringImageViewer.exe
 					string_get_exe_path(uninstall_path);
 				}
 
@@ -4696,7 +4697,7 @@ static int _viv_process_install_command_line_options(wchar_t *cl)
 		
 		os_make_sure_path_exists(install_path);
 		
-		_viv_install_copy_file(install_path,temp_path,(const utf8_t *)"voidImageViewer.exe",1);
+		_viv_install_copy_file(install_path,temp_path,(const utf8_t *)"SpringImageViewer.exe",1);
 		_viv_install_copy_file(install_path,temp_path,(const utf8_t *)"Uninstall.exe",0);
 		_viv_install_copy_file(install_path,temp_path,(const utf8_t *)"Changes.txt",0);
 		
@@ -4704,7 +4705,7 @@ static int _viv_process_install_command_line_options(wchar_t *cl)
 		{
 			wchar_t new_exe_filename_wbuf[STRING_SIZE];
 			
-			string_path_combine_utf8(new_exe_filename_wbuf,install_path,(const utf8_t *)"voidImageViewer.exe");
+			string_path_combine_utf8(new_exe_filename_wbuf,install_path,(const utf8_t *)"SpringImageViewer.exe");
 			
 			os_shell_execute(0,new_exe_filename_wbuf,1,NULL,install_options);
 		}
@@ -4717,18 +4718,18 @@ static int _viv_process_install_command_line_options(wchar_t *cl)
 		// make sure no other process is running.
 		_viv_close_existing_process();
 		
-		// remove %APPDATA%\voidimageviewer
-		if (string_get_appdata_voidimageviewer_path(path))
+		// remove %APPDATA%\SpringImageViewer
+		if (string_get_appdata_springimageviewer_path(path))
 		{
-			_viv_uninstall_delete_file(path,(const utf8_t *)"voidImageViewer.ini");
+			_viv_uninstall_delete_file(path,(const utf8_t *)"SpringImageViewer.ini");
 
 			RemoveDirectory(path);
 		}
 					
 		_viv_uninstall_delete_file(uninstall_path,(const utf8_t *)"Uninstall.exe");
 		_viv_uninstall_delete_file(uninstall_path,(const utf8_t *)"Changes.txt");
-		_viv_uninstall_delete_file(uninstall_path,(const utf8_t *)"voidImageViewer.ini");
-		_viv_uninstall_delete_file(uninstall_path,(const utf8_t *)"voidImageViewer.exe");
+		_viv_uninstall_delete_file(uninstall_path,(const utf8_t *)"SpringImageViewer.ini");
+		_viv_uninstall_delete_file(uninstall_path,(const utf8_t *)"SpringImageViewer.exe");
 		
 		RemoveDirectory(uninstall_path);
 	}
@@ -5280,13 +5281,13 @@ static int _viv_init(int nCmdShow)
 	{
 		SetLastError(0);
 
-		_viv_mutex = CreateMutexA(NULL,0,"VOIDIMAGEVIEWER");
+		_viv_mutex = CreateMutexA(NULL,0,"SPRINGIMAGEVIEWER");
 		
 		if (GetLastError() == ERROR_ALREADY_EXISTS)
 		{
 			HWND hwnd;
 
-			hwnd = FindWindowA("VOIDIMAGEVIEWER",0);
+			hwnd = FindWindowA("SPRINGIMAGEVIEWER",0);
 			
 			if (hwnd)
 			{
@@ -5346,7 +5347,7 @@ static int _viv_init(int nCmdShow)
 		(HICON)LoadImage(os_hinstance,MAKEINTRESOURCE(IDI_ICON1),IMAGE_ICON,GetSystemMetrics(SM_CXICON),GetSystemMetrics(SM_CXICON),0),
 		LoadCursor(NULL,IDC_ARROW),
 		(HBRUSH)(COLOR_BTNFACE+1),
-		"VOIDIMAGEVIEWER",
+		"SPRINGIMAGEVIEWER",
 		(HICON)LoadImage(os_hinstance,MAKEINTRESOURCE(IDI_ICON1),IMAGE_ICON,GetSystemMetrics(SM_CXSMICON),GetSystemMetrics(SM_CYSMICON),0));
 	
 	_viv_hmenu = _viv_create_menu();
@@ -5390,7 +5391,7 @@ static int _viv_init(int nCmdShow)
 
 	_viv_hwnd = os_CreateWindowEx(
 		0,
-		"VOIDIMAGEVIEWER",
+		"SPRINGIMAGEVIEWER",
 		localization_get_string(LOCALIZATION_ID_APP_NAME),
 		window_style,
 		rect.left,rect.top,rect.right - rect.left,rect.bottom - rect.top,
@@ -5443,6 +5444,9 @@ static int _viv_init(int nCmdShow)
 	}
 	
 	_viv_process_command_line(GetCommandLineW());
+
+	// check if we are the default image viewer and prompt the user
+	_viv_check_default_association();
 
 	// if we didn't show the window above, make sure it 
 	// is shown now.
@@ -7943,6 +7947,7 @@ static INT_PTR CALLBACK _viv_options_general_proc(HWND hwnd,UINT msg,WPARAM wPar
 			os_SetDlgItemText_localization_id(hwnd,IDC_ASSOCIATIONS_GROUPBOX,LOCALIZATION_ID_ASSOCIATIONS);
 			os_SetDlgItemText_localization_id(hwnd,IDC_CHECKALL,LOCALIZATION_ID_CHECK_ALL);
 			os_SetDlgItemText_localization_id(hwnd,IDC_CHECKNONE,LOCALIZATION_ID_CHECK_NONE);
+			os_SetDlgItemText_localization_id(hwnd,IDC_SET_DEFAULT,LOCALIZATION_ID_DEFAULT_CHECK_TITLE);
 
 			if (config_appdata) 
 			{
@@ -7995,6 +8000,40 @@ static INT_PTR CALLBACK _viv_options_general_proc(HWND hwnd,UINT msg,WPARAM wPar
 					CheckDlgButton(hwnd,IDC_TIF,check);
 					CheckDlgButton(hwnd,IDC_TIFF,check);
 					CheckDlgButton(hwnd,IDC_WEBP,check);
+					
+					break;
+				}
+				
+				case IDC_SET_DEFAULT:
+				{
+					int i;
+					wchar_t msg_wbuf[STRING_SIZE];
+					wchar_t title_wbuf[STRING_SIZE];
+					
+					// register all file associations
+					for(i=0;i<_VIV_ASSOCIATION_COUNT;i++)
+					{
+						_viv_install_association_by_extension(
+							_viv_association_extensions[i],
+							localization_get_string(_viv_association_description_localization_id_array[i]),
+							_viv_association_icon_locations[i]);
+					}
+					
+					config_default_check_done = 1;
+					
+					// refresh checkbox states
+					for(i=0;i<_VIV_ASSOCIATION_COUNT;i++)
+					{
+						if (_viv_is_association(_viv_association_extensions[i]))
+						{
+							CheckDlgButton(hwnd,_viv_association_dlg_item_id[i],BST_CHECKED);
+						}
+					}
+					
+					string_copy_utf8_string(title_wbuf,localization_get_string(LOCALIZATION_ID_DEFAULT_CHECK_TITLE));
+					string_copy_utf8_string(msg_wbuf,localization_get_string(LOCALIZATION_ID_DEFAULT_CHECK_DONE_MESSAGE));
+					
+					MessageBox(hwnd,msg_wbuf,title_wbuf,MB_OK|MB_ICONINFORMATION);
 					
 					break;
 				}
@@ -8843,10 +8882,10 @@ static void _viv_install_association_by_extension(const char *association,const 
 	// make sure we uninstall old associations first.
 	_viv_uninstall_association_by_extension(association);
 
-	string_copy_utf8_string(class_name,"voidImageViewer");
+	string_copy_utf8_string(class_name,"SpringImageViewer");
 	string_cat(class_name,dot_association);
 
-	string_copy_utf8_string(default_icon,"SOFTWARE\\Classes\\voidImageViewer");
+	string_copy_utf8_string(default_icon,"SOFTWARE\\Classes\\SpringImageViewer");
 	string_cat(default_icon,dot_association);
 	string_cat_utf8(default_icon,"\\DefaultIcon");
 
@@ -8919,14 +8958,14 @@ static void _viv_install_association_by_extension(const char *association,const 
 	{
 		wchar_t wbuf[STRING_SIZE];
 		
-		if (!_viv_get_registry_string(hkey,(const utf8_t *)"voidImageViewer.Backup",wbuf,STRING_SIZE))
+		if (!_viv_get_registry_string(hkey,(const utf8_t *)"SpringImageViewer.Backup",wbuf,STRING_SIZE))
 		{
 			if (!_viv_get_registry_string(hkey,0,wbuf,STRING_SIZE))
 			{
 				*wbuf = 0;
 			}
 			
-			_viv_set_registry_string(hkey,(const utf8_t *)"voidImageViewer.Backup",wbuf);
+			_viv_set_registry_string(hkey,(const utf8_t *)"SpringImageViewer.Backup",wbuf);
 		}
 
 		_viv_set_registry_string(hkey,0,class_name);
@@ -8954,16 +8993,16 @@ static void _viv_uninstall_association_by_extension(const char *association)
 	{
 		wchar_t wbuf[STRING_SIZE];
 		
-		if (_viv_get_registry_string(hkey,(const utf8_t *)"voidImageViewer.Backup",wbuf,STRING_SIZE))
+		if (_viv_get_registry_string(hkey,(const utf8_t *)"SpringImageViewer.Backup",wbuf,STRING_SIZE))
 		{
 			_viv_set_registry_string(hkey,0,wbuf);
 
-			// debug_printf("Delete voidImageViewer.Backup\n");
+			// debug_printf("Delete SpringImageViewer.Backup\n");
 
-			reg_ret = RegDeleteValueA(hkey,"voidImageViewer.Backup");
+			reg_ret = RegDeleteValueA(hkey,"SpringImageViewer.Backup");
 			if (reg_ret == ERROR_SUCCESS)
 			{
-				// debug_printf("Delete voidImageViewer.Backup OK\n");
+				// debug_printf("Delete SpringImageViewer.Backup OK\n");
 			}
 			else
 			{
@@ -8974,7 +9013,7 @@ static void _viv_uninstall_association_by_extension(const char *association)
 		RegCloseKey(hkey);
 	}
 	
-	string_copy_utf8_string(key,(const utf8_t *)"SOFTWARE\\Classes\\voidImageViewer.");
+	string_copy_utf8_string(key,(const utf8_t *)"SOFTWARE\\Classes\\SpringImageViewer.");
 	string_cat_utf8(key,association);
 	
 	RegDeleteKey(HKEY_CURRENT_USER,key);
@@ -8987,7 +9026,7 @@ static int _viv_is_association(const char *association)
 	wchar_t class_name[STRING_SIZE];
 	wchar_t key[STRING_SIZE];
 	
-	string_copy_utf8_string(class_name,(const utf8_t *)"voidImageViewer.");
+	string_copy_utf8_string(class_name,(const utf8_t *)"SpringImageViewer.");
 	string_cat_utf8(class_name,association);
 	
 	ret = 0;
@@ -9050,6 +9089,80 @@ static int _viv_is_association(const char *association)
 	}
 
 	return ret == 2;
+}
+
+static int _viv_is_all_associations(void)
+{
+	int i;
+	
+	for(i=0;i<_VIV_ASSOCIATION_COUNT;i++)
+	{
+		if (!_viv_is_association(_viv_association_extensions[i]))
+		{
+			return 0;
+		}
+	}
+	
+	return 1;
+}
+
+static void _viv_check_default_association(void)
+{
+	// if user has already responded to the prompt, don't ask again.
+	if (config_default_check_done)
+	{
+		return;
+	}
+	
+	// if already the default for all extensions, no need to prompt.
+	if (_viv_is_all_associations())
+	{
+		return;
+	}
+	
+	// prompt the user with a three-button dialog.
+	{
+		wchar_t title_wbuf[STRING_SIZE];
+		wchar_t message_wbuf[STRING_SIZE];
+		int result;
+		
+		string_copy_utf8_string(title_wbuf,localization_get_string(LOCALIZATION_ID_DEFAULT_CHECK_TITLE));
+		string_copy_utf8_string(message_wbuf,localization_get_string(LOCALIZATION_ID_DEFAULT_CHECK_MESSAGE));
+		
+		result = MessageBox(_viv_hwnd,message_wbuf,title_wbuf,MB_YESNOCANCEL|MB_ICONQUESTION);
+		
+		if (result == IDYES)
+		{
+			// automatically register all file associations.
+			int i;
+			
+			for(i=0;i<_VIV_ASSOCIATION_COUNT;i++)
+			{
+				if (!_viv_is_association(_viv_association_extensions[i]))
+				{
+					_viv_install_association_by_extension(
+						_viv_association_extensions[i],
+						localization_get_string(_viv_association_description_localization_id_array[i]),
+						_viv_association_icon_locations[i]);
+				}
+			}
+			
+			config_default_check_done = 1;
+			config_save_settings(config_appdata);
+		}
+		else if (result == IDCANCEL)
+		{
+			// "Cancel" = open Windows Default Apps settings page
+			ShellExecuteW(NULL,L"open",L"ms-settings:defaultapps",NULL,NULL,SW_SHOW);
+			
+			// don't set config_default_check_done, prompt again next launch
+		}
+		else // IDNO
+		{
+			config_default_check_done = 1;
+			config_save_settings(config_appdata);
+		}
+	}
 }
 
 static int _viv_get_registry_string(HKEY hkey,const utf8_t *value,wchar_t *wbuf,int size_in_wchars)
@@ -9777,7 +9890,7 @@ static INT_PTR CALLBACK _viv_about_proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM 
 			string_copy_utf8_string(version_wbuf,localization_get_string(LOCALIZATION_ID_ABOUT_CAPTION));
 			SetWindowText(hwnd,version_wbuf);
 			os_SetDlgItemText_localization_id(hwnd,IDC_ABOUTTITLE,LOCALIZATION_ID_APP_NAME);
-			os_SetDlgItemText_localization_id(hwnd,IDC_ABOUTVOIDIMAGEVIEWER,LOCALIZATION_ID_APP_NAME);
+			os_SetDlgItemText_localization_id(hwnd,IDC_ABOUTSPRINGIMAGEVIEWER,LOCALIZATION_ID_APP_NAME);
 			string_printf(version_wbuf,"%d.%d.%d.%d%s %s",VERSION_MAJOR,VERSION_MINOR,VERSION_REVISION,VERSION_BUILD,VERSION_TYPE,VERSION_TARGET_MACHINE);
 			SetDlgItemText(hwnd,IDC_ABOUTVERSION,version_wbuf);
 			string_printf(version_wbuf,localization_get_string(LOCALIZATION_ID_ABOUT_COPYRIGHT_FORMAT),VERSION_YEAR);
@@ -11855,7 +11968,7 @@ static void _viv_command_line_options(void)
 	wchar_t *text_wbuf;
 	wchar_t caption_wbuf[STRING_SIZE];
 
-	text_wbuf = string_alloc_utf8("Usage:\nvoidImageViewer.exe [/switches] [filename(s)]\n"
+	text_wbuf = string_alloc_utf8("Usage:\nSpringImageViewer.exe [/switches] [filename(s)]\n"
 		"\n"
 		"Switches:\n"
 		"/slideshow\tStart a slideshow.\n"
@@ -12662,14 +12775,14 @@ static void _viv_edit_key_remove_currently_used_by(_viv_key_list_t *keylist,DWOR
 }
 
 //FIXME: we should timeout 
-//FIXME: we should check for the process name voidImageViewer.exe rather than the window class name. -be careful when uninstalling as the non-admin process will be waiting for the admin process to exit.
+//FIXME: we should check for the process name SpringImageViewer.exe rather than the window class name. -be careful when uninstalling as the non-admin process will be waiting for the admin process to exit.
 static void _viv_close_existing_process(void)
 {
 	for(;;)
 	{
 		HWND hwnd;
 		
-		hwnd = FindWindowA("VOIDIMAGEVIEWER",0);
+		hwnd = FindWindowA("SPRINGIMAGEVIEWER",0);
 		if (hwnd)
 		{
 			DWORD process_id;
@@ -12717,7 +12830,7 @@ static int _viv_is_start_menu_shortcuts(void)
 	// delete shortcuts
 	if (os_get_special_folder_path(special_folder_path_wbuf,CSIDL_COMMON_PROGRAMS))
 	{
-		string_path_combine_utf8(path_wbuf,special_folder_path_wbuf,(const utf8_t *)"void Image Viewer");
+		string_path_combine_utf8(path_wbuf,special_folder_path_wbuf,(const utf8_t *)"Spring Image Viewer");
 
 		// make sure this directory exists!		
 		if (GetFileAttributesW(path_wbuf) != INVALID_FILE_ATTRIBUTES)
@@ -12747,14 +12860,14 @@ static void _viv_install_start_menu_shortcuts(void)
 		wchar_t uninstall_filename_wbuf[STRING_SIZE];
 		wchar_t lnk_wbuf[STRING_SIZE];
 		
-		string_path_combine_utf8(path_wbuf,special_folder_path_wbuf,(const utf8_t *)"void Image Viewer");
+		string_path_combine_utf8(path_wbuf,special_folder_path_wbuf,(const utf8_t *)"Spring Image Viewer");
 
 		// make sure this directory exists!		
 		os_make_sure_path_exists(path_wbuf);
 
-		// void image viewer.lnk
+		// Spring Image Viewer.lnk
 		_viv_get_exe_filename(exe_filename_wbuf);
-		string_path_combine_utf8(lnk_wbuf,path_wbuf,"void Image Viewer.lnk");
+		string_path_combine_utf8(lnk_wbuf,path_wbuf,"Spring Image Viewer.lnk");
 		os_create_shell_link(exe_filename_wbuf,lnk_wbuf);
 	
 		// uninstall
@@ -12777,10 +12890,10 @@ static void _viv_uninstall_start_menu_shortcuts(void)
 	{
 		wchar_t lnk_wbuf[STRING_SIZE];
 
-		string_path_combine_utf8(path_wbuf,special_folder_path_wbuf,(const utf8_t *)"void Image Viewer");
+		string_path_combine_utf8(path_wbuf,special_folder_path_wbuf,(const utf8_t *)"Spring Image Viewer");
 		
 		// localized.
-		string_path_combine_utf8(lnk_wbuf,path_wbuf,"void Image Viewer.lnk");
+		string_path_combine_utf8(lnk_wbuf,path_wbuf,"Spring Image Viewer.lnk");
 		DeleteFile(lnk_wbuf);
 		
 		string_path_combine_utf8(lnk_wbuf,path_wbuf,"Uninstall.lnk");
@@ -14230,8 +14343,7 @@ static HBITMAP _viv_get_mipmap(HBITMAP hbitmap,int image_wide,int image_high,int
 						
 						last_stretch_mode = SetStretchBltMode(mem_hdc,HALFTONE);
 						
-						// for crazy large images -https://github.com/voidtools/voidImageViewer/issues/45
-						// use stitching, since we are using HALFTONE here, we will end up with sharp tile edges
+						// for crazy large images - use stitching, since we are using HALFTONE here, we will end up with sharp tile edges
 						// but's its better than showing a black image.
 						if (_viv_StretchBltStitch(mem_hdc,0,0,mip_wide,mip_high,mem2_hdc,0,0,best_wide,best_high,SRCCOPY,0,0,mip_wide,mip_high))
 						{

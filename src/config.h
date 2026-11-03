@@ -1,5 +1,5 @@
 //
-// Copyright 2025 voidtools / David Carpenter
+// Copyright 2025
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -120,6 +120,7 @@ extern BYTE config_pixel_info;
 extern BYTE config_orientation;
 extern BYTE config_title_bar_format;
 extern int config_add_command_line_timeout;
+extern BYTE config_default_check_done;
 
 #ifdef __cplusplus
 }

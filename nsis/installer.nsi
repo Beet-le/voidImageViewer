@@ -1,5 +1,5 @@
 ;
-; Copyright 2025 voidtools / David Carpenter
+; Copyright 2025
 ; 
 ; Multi-language and multi-VS version support added by hesphoros (2026)
 ; 
@@ -80,12 +80,12 @@ XPStyle on
 !ifdef x64
 	
 	!define TARGETMACHINE "x64"
-	InstallDir "$PROGRAMFILES64\voidImageViewer"
+	InstallDir "$PROGRAMFILES64\SpringImageViewer"
 	
 !else
 	
 	!define TARGETMACHINE "x86"
-	InstallDir "$PROGRAMFILES\voidImageViewer"
+	InstallDir "$PROGRAMFILES\SpringImageViewer"
 	
 !endif
 	
@@ -95,17 +95,17 @@ Var existing_ini_filename
 Var admin_install_options
 Var user_install_options
 
-BrandingText "void Image Viewer ${VERSION}${BETAVERSION} (${TARGETMACHINE}) Setup"
+BrandingText "Spring Image Viewer ${VERSION}${BETAVERSION} (${TARGETMACHINE}) Setup"
 
 ; settings /SOLID will save a few KBs
 SetCompressor /SOLID lzma
-Name "void Image Viewer"
+Name "Spring Image Viewer"
 
 ; Output file name with language code
-OutFile "voidImageViewer-${VERSION}${BETAVERSION}.${TARGETMACHINE}.${LANG_CODE}-Setup.exe"
+OutFile "SpringImageViewer-${VERSION}${BETAVERSION}.${TARGETMACHINE}.${LANG_CODE}-Setup.exe"
 	
 ; MUI settings
-!define MUI_ICON "..\res\voidImageViewer.ico"
+!define MUI_ICON "..\res\SpringImageViewer.ico"
 
 !insertmacro MUI_PAGE_LICENSE "${LICENSE_FILE}"
 
@@ -137,12 +137,12 @@ Page custom InstallOptions2
 VIProductVersion "${VERSION}${BETAVERSION}"
 
 ; don't localize these:
-VIAddVersionKey "ProductName" "void Image Viewer"
+VIAddVersionKey "ProductName" "Spring Image Viewer"
 VIAddVersionKey "Comments" ""
 VIAddVersionKey "CompanyName" ""
 VIAddVersionKey "LegalTrademarks" ""
-VIAddVersionKey "LegalCopyright" "Copyright (c) 2025 David Carpenter"
-VIAddVersionKey "FileDescription" "void Image Viewer Setup"
+VIAddVersionKey "LegalCopyright" "Copyright (c) 2025"
+VIAddVersionKey "FileDescription" "Spring Image Viewer Setup"
 
 VIAddVersionKey "FileVersion" "${VERSION}${BETAVERSION}.${TARGETMACHINE}.${LANG_CODE}"
 VIAddVersionKey "ProductVersion" "${VERSION}${BETAVERSION}.${TARGETMACHINE}.${LANG_CODE}"
@@ -166,7 +166,7 @@ Function .onInit
 	SetRegView 64
 !endif
 
-	ReadRegStr $R2 HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\voidImageViewer" 'UninstallString'
+	ReadRegStr $R2 HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\SpringImageViewer" 'UninstallString'
 
 !ifdef x64
 	SetRegView 32
@@ -183,13 +183,13 @@ Function .onInit
 no_existing_install_dir:
 
 	; get the existing ini filename.
-	StrCpy $existing_ini_filename "$APPDATA\voidImageViewer\voidImageViewer.ini"
+	StrCpy $existing_ini_filename "$APPDATA\SpringImageViewer\SpringImageViewer.ini"
 	
 	; Check if appdata is set to zero
 	; $INSTDIR is the existing install location (or the default one if it does not exist)
-	ReadINIStr $0 "$INSTDIR\voidImageViewer.ini" "voidImageViewer" "appdata"
+	ReadINIStr $0 "$INSTDIR\SpringImageViewer.ini" "SpringImageViewer" "appdata"
     StrCmp $0 "0" 0 skip_check_app_data
-	StrCpy $existing_ini_filename "$INSTDIR\voidImageViewer.ini"
+	StrCpy $existing_ini_filename "$INSTDIR\SpringImageViewer.ini"
 	!insertmacro MUI_INSTALLOPTIONS_WRITE "${INSTALL_OPTIONS_FILE}" "Field 2" "State" "0"
 	!insertmacro MUI_INSTALLOPTIONS_WRITE "${INSTALL_OPTIONS_FILE}" "Field 3" "State" "1"
 
@@ -221,20 +221,20 @@ FunctionEnd
 Function un.onInit
 
 	; get the existing ini filename.
-	StrCpy $existing_ini_filename "$APPDATA\voidImageViewer\voidImageViewer.ini"
+	StrCpy $existing_ini_filename "$APPDATA\SpringImageViewer\SpringImageViewer.ini"
 	
 	; Check if appdata is set to zero
 	; $INSTDIR is the existing install location
-	ReadINIStr $0 "$INSTDIR\voidImageViewer.ini" "voidImageViewer" "appdata"
+	ReadINIStr $0 "$INSTDIR\SpringImageViewer.ini" "SpringImageViewer" "appdata"
     StrCmp $0 "0" 0 skip_check_app_data
-	StrCpy $existing_ini_filename "$INSTDIR\voidImageViewer.ini"
+	StrCpy $existing_ini_filename "$INSTDIR\SpringImageViewer.ini"
 
 skip_check_app_data:
 
 FunctionEnd
 
 ; sections
-Section "voidImageViewer" SECTION_VOIDIMAGEVIEWER
+Section "SpringImageViewer" SECTION_SPRINGIMAGEVIEWER
 
 	; init
 	StrCpy $admin_install_options ""
@@ -248,7 +248,7 @@ Section "voidImageViewer" SECTION_VOIDIMAGEVIEWER
 
 no_app_data:
 
-	; this option is special, we MUST unset any option that voidImageViewer was previously installed with.
+	; this option is special, we MUST unset any option that SpringImageViewer was previously installed with.
 	StrCpy $admin_install_options "$admin_install_options /noappdata"
 	
 skip_app_data:	
@@ -374,29 +374,29 @@ no_webp_association:
 skip_webp_association:
 
 	; ----------------------------------
-	; begin voidImageViewer installation
+	; begin SpringImageViewer installation
 	; ----------------------------------
 	
 	SectionIn RO
 
 	InitPluginsDir
-	SetOutPath "$pluginsdir\voidImageViewer"
+	SetOutPath "$pluginsdir\SpringImageViewer"
 
 	; write out files to copy.
 	; VS version and build config are configurable via defines
 
 	!ifdef x64
 	
-		File "..\${VS_VERSION}\x64\${BUILD_CONFIG}\voidImageViewer.exe"
+		File "..\${VS_VERSION}\x64\${BUILD_CONFIG}\SpringImageViewer.exe"
 		
 	!else
 	
-		File "..\${VS_VERSION}\${BUILD_CONFIG}\voidImageViewer.exe"
+		File "..\${VS_VERSION}\${BUILD_CONFIG}\SpringImageViewer.exe"
 		
 	!endif
 
 	; File "..\Changes.txt"
-	WriteUninstaller "$pluginsdir\voidImageViewer\Uninstall.exe"
+	WriteUninstaller "$pluginsdir\SpringImageViewer\Uninstall.exe"
 
 	; check for command line options that will override the default install options.
 	${GetOptions} $CMDLINE "/install-options" $0
@@ -406,7 +406,7 @@ skip_webp_association:
 	; install with admin rights.
 	; MessageBox MB_YESNOCANCEL|MB_ICONEXCLAMATION "ADMIN $admin_install_options"
 	ClearErrors
-	ExecWait '"$pluginsdir\voidImageViewer\voidImageViewer.exe" /install "$INSTDIR" /install-options "$admin_install_options"' $0
+	ExecWait '"$pluginsdir\SpringImageViewer\SpringImageViewer.exe" /install "$INSTDIR" /install-options "$admin_install_options"' $0
 	IfErrors exec_admin_error
 	IntCmp $0 0 exec_admin_ok
 	
@@ -417,7 +417,7 @@ exec_admin_error:
 exec_admin_ok:
 
 	ClearErrors
-	ExecWait '"$INSTDIR\voidImageViewer.exe" $user_install_options' $0
+	ExecWait '"$INSTDIR\SpringImageViewer.exe" $user_install_options' $0
 	IfErrors exec_install_options_error
 	IntCmp $0 0 exec_install_options_ok
 
@@ -434,18 +434,18 @@ Section "Uninstall"
 	; Make sure $InstDir is not the current directory so we can remove it
 	SetOutPath $Temp
 	    
-	; copy voidImageViewer.exe to temp folder.	
-	CopyFiles /SILENT $INSTDIR\voidImageViewer.exe $Temp\voidImageViewer.exe
+	; copy SpringImageViewer.exe to temp folder.	
+	CopyFiles /SILENT $INSTDIR\SpringImageViewer.exe $Temp\SpringImageViewer.exe
 
 	; run uninstaller with admin rights
 	; this will uninstall any localized shortcuts etc..
 	; this also removes the service if installed
 	; which is something we can not do easily from the nsis installer.
 	; do this before we try to terminate the app.
-    ExecWait '"$Temp\voidImageViewer.exe" /uninstall "$INSTDIR"'
+    ExecWait '"$Temp\SpringImageViewer.exe" /uninstall "$INSTDIR"'
 
-	; delete temp voidImageViewer
-    Delete "$Temp\voidImageViewer.exe"
+	; delete temp SpringImageViewer
+    Delete "$Temp\SpringImageViewer.exe"
 
 SectionEnd
 

@@ -28,7 +28,7 @@ static const utf8_t *_localization_string_array_zh_cn[LOCALIZATION_ID_COUNT] =
 	"简体中文", // LOCALIZATION_ID_LANGUAGE
 
 	// Application name
-	"void Image Viewer", // LOCALIZATION_ID_APP_NAME
+	"Spring Image Viewer", // LOCALIZATION_ID_APP_NAME
 
 	// File menu
 	"文件(&F)", // LOCALIZATION_ID_FILE,
@@ -180,9 +180,9 @@ static const utf8_t *_localization_string_array_zh_cn[LOCALIZATION_ID_COUNT] =
 	"主页(&P)", // LOCALIZATION_ID_HOME_PAGE,
 	"捐赠(&D)", // LOCALIZATION_ID_DONATE,
 	"关于(&A)", // LOCALIZATION_ID_ABOUT,
-	"https://www.voidtools.com/support/voidimageviewer/", // LOCALIZATION_ID_HELP_SUPPORT_URL,
-	"https://www.voidtools.com/donate/", // LOCALIZATION_ID_HELP_DONATE,
-	"https://www.voidtools.com/", // LOCALIZATION_ID_HELP_WEBSITE_URL,
+	"", // LOCALIZATION_ID_HELP_SUPPORT_URL,
+	"", // LOCALIZATION_ID_HELP_DONATE_URL,
+	"", // LOCALIZATION_ID_HELP_WEBSITE_URL,
 
 	// Toolbar
 	"上一个", // LOCALIZATION_ID_TOOLBAR_PREVIOUS_IMAGE_BUTTON,
@@ -207,13 +207,13 @@ static const utf8_t *_localization_string_array_zh_cn[LOCALIZATION_ID_COUNT] =
 
 
 	// Dialog strings
-	"选项 - void Image Viewer", // LOCALIZATION_ID_OPTIONS_CAPTION,
+	"选项 - Spring Image Viewer", // LOCALIZATION_ID_OPTIONS_CAPTION,
 	"常规", // LOCALIZATION_ID_OPTIONS_GENERAL_DIALOG,
 	"视图", // LOCALIZATION_ID_OPTIONS_VIEW_DIALOG,
 	"控件", // LOCALIZATION_ID_OPTIONS_CONTROLS_DIALOG,
 	"确定", // LOCALIZATION_ID_OK_BUTTON,
 	"取消", // LOCALIZATION_ID_CANCEL_BUTTON,
-	"在 %APPDATA%\\voidImageViewer 中存储设置(&S)", // LOCALIZATION_ID_STORE_SETTINGS_APPDATA,
+	"在 %APPDATA%\\SpringImageViewer 中存储设置(&S)", // LOCALIZATION_ID_STORE_SETTINGS_APPDATA,
 	"允许多个实例(&I)", // LOCALIZATION_ID_ALLOW_MULTIPLE_INSTANCES,
 	"开始菜单快捷方式(&M)", // LOCALIZATION_ID_STARTMENU_SHORTCUTS,
 	"文件关联", // LOCALIZATION_ID_ASSOCIATIONS,
@@ -251,13 +251,13 @@ static const utf8_t *_localization_string_array_zh_cn[LOCALIZATION_ID_COUNT] =
 	"分钟", // LOCALIZATION_ID_CUSTOM_RATE_MINUTES,
 	"秒", // LOCALIZATION_ID_CUSTOM_RATE_SECONDS,
 	"毫秒", // LOCALIZATION_ID_CUSTOM_RATE_MILLISECONDS,
-	"关于 void Image Viewer", // LOCALIZATION_ID_ABOUT_CAPTION,
+	"关于 Spring Image Viewer", // LOCALIZATION_ID_ABOUT_CAPTION,
 	"重命名", // LOCALIZATION_ID_RENAME_CAPTION,
 	"跳转到", // LOCALIZATION_ID_JUMP_TO_TITLE,
 	"搜索 Everything", // LOCALIZATION_ID_SEARCH_EVERYTHING,
-	"版权所有 © %d voidtools", // LOCALIZATION_ID_ABOUT_COPYRIGHT_FORMAT,
-	"support@voidtools.com", // LOCALIZATION_ID_ABOUT_EMAIL,
-	"www.voidtools.com", // LOCALIZATION_ID_ABOUT_WEBSITE,
+	"", // LOCALIZATION_ID_ABOUT_COPYRIGHT_FORMAT,
+	"", // LOCALIZATION_ID_ABOUT_EMAIL,
+	"", // LOCALIZATION_ID_ABOUT_WEBSITE,
 	"打开图像", // LOCALIZATION_ID_OPEN_IMAGE_CAPTION,
 	"所有图像文件", // LOCALIZATION_ID_OPEN_ALL_IMAGE_FILES,
 	"所有文件", // LOCALIZATION_ID_OPEN_ALL_FILES,
@@ -285,14 +285,22 @@ static const utf8_t *_localization_string_array_zh_cn[LOCALIZATION_ID_COUNT] =
 	"复制到", // LOCALIZATION_ID_COPY_TO_CAPTION,
 	"移动到", // LOCALIZATION_ID_MOVE_TO_CAPTION,
 
+	// Default app check
+	"设为默认看图软件", // LOCALIZATION_ID_DEFAULT_CHECK_TITLE
+	"Spring Image Viewer 当前不是系统默认看图软件。\n\n是否将其设为默认？\n\n点击\"是\" - 自动注册文件关联\n点击\"打开设置\" - 前往 Windows 默认应用设置", // LOCALIZATION_ID_DEFAULT_CHECK_MESSAGE
+	"是(&Y)", // LOCALIZATION_ID_DEFAULT_CHECK_YES
+	"打开设置(&S)", // LOCALIZATION_ID_DEFAULT_CHECK_OPEN_SETTINGS
+	"否(&N)", // LOCALIZATION_ID_DEFAULT_CHECK_NO
+	"文件关联已注册。如果在 Windows 10/11 上未生效，请通过系统设置手动指定。", // LOCALIZATION_ID_DEFAULT_CHECK_DONE_MESSAGE
+
 	// Association descriptions
-	"Bitmap Image",
-	"Animated GIF Image",
-	"Icon File",
-	"JPEG Image",
-	"JPEG Image",
-	"PNG Image",
-	"TIFF Image",
-	"TIFF Image",
-	"WebP Image",
+	"位图图像",
+	"动画GIF图像",
+	"图标文件",
+	"JPEG图像",
+	"JPEG图像",
+	"PNG图像",
+	"TIFF图像",
+	"TIFF图像",
+	"WebP图像",
 };

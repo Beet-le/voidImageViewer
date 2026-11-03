@@ -1,5 +1,5 @@
 //
-// Copyright 2025 voidtools / David Carpenter
+// Copyright 2025
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -55,7 +55,7 @@ void string_remove_extension(wchar_t *buf);
 wchar_t *string_get_extension(const wchar_t *s);
 wchar_t *string_skip_ws(const wchar_t *p);
 wchar_t *string_get_word(wchar_t *p,wchar_t *buf);
-int string_get_appdata_voidimageviewer_path(wchar_t *wbuf);
+int string_get_appdata_springimageviewer_path(wchar_t *wbuf);
 BOOL string_is_dot(const wchar_t *s);
 
 #ifdef __cplusplus

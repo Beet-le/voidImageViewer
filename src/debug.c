@@ -1,5 +1,5 @@
 //
-// Copyright 2025 voidtools / David Carpenter
+// Copyright 2025
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -34,7 +34,7 @@ void DECLSPEC_NORETURN debug_fatal(const char *format,...)
 	string_vprintf(wbuf,format,args);
 	va_end(args);
 
-	MessageBox(0,wbuf,L"voidImageViewer",MB_OK|MB_ICONERROR|MB_SYSTEMMODAL);
+	MessageBox(0,wbuf,L"SpringImageViewer",MB_OK|MB_ICONERROR|MB_SYSTEMMODAL);
 	ExitProcess(0);
 }
 

@@ -1,0 +1,31 @@
+# Visual Studio IDE 缓存与用户设置
+.vs/
+FileContentIndex/
+*.suo
+*.vcxproj.user
+*.user
+
+# 编译中间产物
+*.obj
+*.tlog
+*.ilk
+*.pdb
+*.log
+*.res
+*.recipe
+*.lastbuildstate
+*.FileListAbsolute.txt
+*.exp
+*.lib
+*.command
+
+# VS 工程的输出/中间目录（含生成的 exe 与运行时写出的 ini）
+# 第二行匹配项目名哈希生成的中间目录，如 vs2026/SpringIm.80928F09/x64/
+vs*/x64/
+vs*/*/x64/
+vs*/Win32/
+vs*/Debug/
+vs*/Release/
+
+# NSIS 打包产物（installer.nsi 的 OutFile 直接落在 nsis/ 下）
+nsis/*-Setup.exe
