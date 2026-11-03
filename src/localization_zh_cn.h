@@ -301,4 +301,7 @@ static const utf8_t *_localization_string_array_zh_cn[LOCALIZATION_ID_COUNT] =
 	"TIFF图像",
 	"TIFF图像",
 	"WebP图像",
+
+	// Context menu
+	"用 Spring Image Viewer 打开",
 };

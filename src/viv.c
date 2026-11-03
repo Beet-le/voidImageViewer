@@ -500,6 +500,8 @@ static INT_PTR CALLBACK _viv_options_controls_proc(HWND hwnd,UINT msg,WPARAM wPa
 static void _viv_install_association_by_extension(const char *association,const char *description,const char *icon_location);
 static void _viv_uninstall_association_by_extension(const char *association);
 static int _viv_is_association(const char *association);
+static void _viv_install_context_menu(void);
+static void _viv_uninstall_context_menu(void);
 static int _viv_get_registry_string(HKEY hkey,const utf8_t *value,wchar_t *wbuf,int size_in_wchars);
 static int _viv_set_registry_string(HKEY hkey,const utf8_t *value,const wchar_t *wbuf);
 static void _viv_check_menus(HMENU hmenu);
@@ -4704,6 +4706,9 @@ static int _viv_process_install_command_line_options(wchar_t *cl)
 	{
 		wchar_t path[STRING_SIZE];
 		
+		// remove Explorer right-click context menu entry
+		_viv_uninstall_context_menu();
+		
 		// make sure no other process is running.
 		_viv_close_existing_process();
 		
@@ -8008,6 +8013,9 @@ static INT_PTR CALLBACK _viv_options_general_proc(HWND hwnd,UINT msg,WPARAM wPar
 							_viv_association_icon_locations[i]);
 					}
 					
+					// also add to Explorer right-click context menu
+					_viv_install_context_menu();
+					
 					config_default_check_done = 1;
 					
 					// refresh checkbox states
@@ -9136,6 +9144,9 @@ static void _viv_check_default_association(void)
 				}
 			}
 			
+			// also add to Explorer right-click context menu
+			_viv_install_context_menu();
+			
 			config_default_check_done = 1;
 			config_save_settings(config_appdata);
 		}
@@ -9152,6 +9163,52 @@ static void _viv_check_default_association(void)
 			config_save_settings(config_appdata);
 		}
 	}
+}
+
+static void _viv_install_context_menu(void)
+{
+	HKEY hkey;
+	wchar_t key[STRING_SIZE];
+	wchar_t label_wbuf[STRING_SIZE];
+	wchar_t filename[STRING_SIZE];
+	wchar_t command[STRING_SIZE];
+	
+	// Write context menu label to HKCU\Software\Classes\*\shell\SpringImageViewer
+	string_copy_utf8_string(key,(const utf8_t *)"SOFTWARE\\Classes\\*\\shell\\SpringImageViewer");
+	
+	if (RegCreateKeyExW(HKEY_CURRENT_USER,key,0,0,0,KEY_QUERY_VALUE|KEY_SET_VALUE,0,&hkey,0) == ERROR_SUCCESS)
+	{
+		string_copy_utf8_string(label_wbuf,localization_get_string(LOCALIZATION_ID_CONTEXT_MENU_LABEL));
+		_viv_set_registry_string(hkey,0,label_wbuf);
+		
+		// Set the icon to the application's icon
+		_viv_get_exe_filename(filename);
+		_viv_set_registry_string(hkey,(const utf8_t *)"Icon",filename);
+		
+		RegCloseKey(hkey);
+	}
+	
+	// Write command: "path\to\SpringImageViewer.exe" "%1"
+	string_copy_utf8_string(key,(const utf8_t *)"SOFTWARE\\Classes\\*\\shell\\SpringImageViewer\\command");
+	
+	if (RegCreateKeyExW(HKEY_CURRENT_USER,key,0,0,0,KEY_QUERY_VALUE|KEY_SET_VALUE,0,&hkey,0) == ERROR_SUCCESS)
+	{
+		_viv_get_exe_filename(filename);
+		
+		string_copy_utf8_string(command,(const utf8_t *)"\"");
+		string_cat(command,filename);
+		string_cat_utf8(command,(const utf8_t *)"\" \"%1\"");
+		
+		_viv_set_registry_string(hkey,0,command);
+		
+		RegCloseKey(hkey);
+	}
+}
+
+static void _viv_uninstall_context_menu(void)
+{
+	RegDeleteKeyA(HKEY_CURRENT_USER,"SOFTWARE\\Classes\\*\\shell\\SpringImageViewer\\command");
+	RegDeleteKeyA(HKEY_CURRENT_USER,"SOFTWARE\\Classes\\*\\shell\\SpringImageViewer");
 }
 
 static int _viv_get_registry_string(HKEY hkey,const utf8_t *value,wchar_t *wbuf,int size_in_wchars)
