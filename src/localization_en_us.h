@@ -177,8 +177,6 @@ static const utf8_t *_localization_string_array_en_us[LOCALIZATION_ID_COUNT] =
 	"&Help", // LOCALIZATION_ID_HELP,
 	"&Help", // LOCALIZATION_ID_HELP_MENU,
 	"&Command Line Options", // LOCALIZATION_ID_COMMAND_LINE_OPTIONS,
-	"Home &Page", // LOCALIZATION_ID_HOME_PAGE,
-	"&Donate", // LOCALIZATION_ID_DONATE,
 	"&About", // LOCALIZATION_ID_ABOUT,
 	"", // LOCALIZATION_ID_HELP_SUPPORT_URL,
 	"", // LOCALIZATION_ID_HELP_DONATE_URL,

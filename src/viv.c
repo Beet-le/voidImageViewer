@@ -960,9 +960,6 @@ static _viv_command_t _viv_commands[] =
 	{LOCALIZATION_ID_HELP_MENU,MF_STRING,_VIV_MENU_HELP,VIV_ID_HELP_HELP},
 	{LOCALIZATION_ID_COMMAND_LINE_OPTIONS,MF_STRING,_VIV_MENU_HELP,VIV_ID_HELP_COMMAND_LINE_OPTIONS},
 	{LOCALIZATION_ID_INVALID,MF_SEPARATOR,_VIV_MENU_HELP,0},
-	{LOCALIZATION_ID_HOME_PAGE,MF_STRING,_VIV_MENU_HELP,VIV_ID_HELP_WEBSITE},
-	{LOCALIZATION_ID_DONATE,MF_STRING,_VIV_MENU_HELP,VIV_ID_HELP_DONATE},
-	{LOCALIZATION_ID_INVALID,MF_SEPARATOR,_VIV_MENU_HELP,0},
 	{LOCALIZATION_ID_ABOUT,MF_STRING,_VIV_MENU_HELP,VIV_ID_HELP_ABOUT},
 };
 
@@ -1630,7 +1627,7 @@ static void _viv_on_size(void)
 			toolbar_wide = _viv_toolbar_get_wide();
 			
 			SetWindowPos(_viv_rebar_hwnd,0,0,high - _viv_get_controls_high(),wide,_viv_get_controls_high(),SWP_NOZORDER|SWP_NOACTIVATE);
-			SetWindowPos(_viv_toolbar_hwnd,0,(wide / 2) - (toolbar_wide /2),6,toolbar_wide,_viv_get_controls_high() - 6,SWP_NOZORDER|SWP_NOACTIVATE);
+			SetWindowPos(_viv_toolbar_hwnd,0,(wide / 2) - (toolbar_wide /2),4,toolbar_wide,_viv_get_controls_high() - 4,SWP_NOZORDER|SWP_NOACTIVATE);
 			
 			high -= _viv_get_controls_high();
 		}
@@ -1689,16 +1686,8 @@ static void _viv_command_with_is_key_repeat(int command_id,int is_key_repeat)
 			_viv_command_line_options();
 			break;
 			
-		case VIV_ID_HELP_DONATE:
-			ShellExecuteA(_viv_hwnd,NULL,localization_get_string(LOCALIZATION_ID_HELP_DONATE_URL),NULL,NULL,SW_SHOWNORMAL);
-			break;
-			
 		case VIV_ID_HELP_ABOUT:
 			DialogBox(os_hinstance,MAKEINTRESOURCE(IDD_ABOUT),_viv_hwnd,_viv_about_proc);
-			break;
-			
-		case VIV_ID_HELP_WEBSITE:
-			ShellExecuteA(_viv_hwnd,NULL,localization_get_string(LOCALIZATION_ID_HELP_WEBSITE_URL),NULL,NULL,SW_SHOWNORMAL);
 			break;
 			
 		case VIV_ID_FILE_EXIT:
@@ -11107,7 +11096,7 @@ static void _viv_controls_show(int show)
 			SendMessage(_viv_toolbar_hwnd,TB_SETEXTENDEDSTYLE,0,TBSTYLE_EX_MIXEDBUTTONS|TBSTYLE_EX_HIDECLIPPEDBUTTONS|TBSTYLE_EX_DOUBLEBUFFER);
 			SendMessage(_viv_toolbar_hwnd,TB_BUTTONSTRUCTSIZE,sizeof(TBBUTTON),0);
 			
-			_viv_toolbar_image_list = ImageList_Create((16 * os_logical_wide) / 96,(16 * os_logical_high) / 96,ILC_COLOR24|ILC_MASK,0,0);
+			_viv_toolbar_image_list = ImageList_Create((12 * os_logical_wide) / 96,(12 * os_logical_high) / 96,ILC_COLOR32,0,0);
 			
 			ImageList_AddIcon(_viv_toolbar_image_list,LoadIcon(os_hinstance,(LPCTSTR)IDI_PREV));
 			ImageList_AddIcon(_viv_toolbar_image_list,LoadIcon(os_hinstance,(LPCTSTR)IDI_PLAY));
@@ -11555,7 +11544,7 @@ static int _viv_get_controls_high(void)
 {
 	if (_viv_toolbar_hwnd)
 	{
-		return (32 * os_logical_high) / 96;
+		return (24 * os_logical_high) / 96;
 	}
 	
 	return 0;
