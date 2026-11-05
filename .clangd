@@ -1,0 +1,43 @@
+# clangd 配置文件：只影响 IDE 的代码分析/补全，不参与 MSVC 构建
+# （vs2005 / vs2019 / vs2026 工程与 NSIS 打包流程均与此文件无关）。
+#
+# 参数取自 vs2026\SpringImageViewer.vcxproj 的 x64 配置：
+#   <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;BZ_NO_STDIO;VERSION_DEBUG;VERSION_X64
+#   <AdditionalIncludeDirectories>..\libwebp
+#   <CharacterSet>Unicode   -> MSVC 会隐式注入 UNICODE 与 _UNICODE
+#
+# 包含路径中的相对路径以“被分析文件所在目录”为基准（已在文件内逐条说明）。
+#
+# 验证方式：clangd --check=src\viv.c 与 --check=src\webp.c，代码诊断均为 0。
+# 修改本文件后需要重启 clangd（或重新打开工作区）才会生效。
+
+CompileFlags:
+  Add:
+    # 与 x64 工程一致的目标三元组，避免 clangd 按默认/host 三元组解析 SDK 头文件
+    - --target=x86_64-windows-msvc
+
+    # CharacterSet=Unicode 对应的两个宏。缺失时 windows.h 走 ANSI 分支，
+    # 会把 wchar_t* 与 WIN32_FIND_DATA::cFileName 的 CHAR[260] 判为不兼容类型
+    - -DUNICODE
+    - -D_UNICODE
+
+    # 工程显式定义的宏
+    - -DWIN32
+    - -D_WINDOWS
+    - -DBZ_NO_STDIO
+    # 必须定义，否则 src/viv.c 中的目标架构判断会落到 #error unknown target machine
+    # 分析 32 位配置时把下面一行换成 -DVERSION_X86
+    - -DVERSION_X64
+
+    # 包含路径（对应 vcxproj 的 <AdditionalIncludeDirectories>..\libwebp）
+    # 注：clangd 对没有 compile_commands.json 的回退编译命令以“被分析文件所在目录”
+    # 作为基准目录，所以这里写 ../libwebp（src/ 的上一级 = 仓库根下的 libwebp），
+    # 否则 <src/webp/decode.h> 会被解析成 src\libwebp\... 而报 file not found
+    - -I../libwebp
+    # 工程源码目录（对 src\ 下的文件等价于其自身目录）
+    - -I../src
+
+    # 回调函数指针/参数以 void* 与结构体指针互换传递，MSVC 只按警告处理，
+    # clang 默认是错误；这里降级为警告，与 MSVC /W3 的行为保持一致
+    - -Wno-error=incompatible-function-pointer-types
+    - -Wno-error=incompatible-pointer-types

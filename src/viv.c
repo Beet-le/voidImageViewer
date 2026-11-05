@@ -257,7 +257,9 @@
 #define _VIV_ASSOCIATION_TIFF				0x00000080
 #define _VIV_ASSOCIATION_WEBP				0x00000100
 
-#define _VIV_ZOOM_MAX 16
+#define _VIV_ZOOM_MAX 48
+
+#define _VIV_WHEEL_ZOOM_NOTCH 120 // standard WM_MOUSEWHEEL delta (WHEEL_DELTA) for one wheel notch
 
 #define BCM_SETSHIELD	0x0000160C
 
@@ -447,6 +449,9 @@ typedef struct _viv_name_mapping_s
 	SHNAMEMAPPING *mappings;
 }_viv_name_mapping_t;
 
+// forward declaration; the struct body is defined further below
+typedef struct _viv_key_list_s _viv_key_list_t;
+
 static void _viv_update_title(void);
 static void _viv_on_size(void);
 static LRESULT CALLBACK _viv_proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam);
@@ -568,11 +573,11 @@ static int _viv_vk_to_text(wchar_t *wbuf,int vk);
 static void _viv_cat_key_mod(wchar_t *wbuf,int vk,const utf8_t *default_keytext);
 static void _viv_get_key_text(wchar_t *wbuf,DWORD keyflags);
 static HMENU _viv_create_menu(void);
-static void _viv_key_add(struct _viv_key_list_s *key_list,int command_index,DWORD keyflags);
-static void _viv_key_clear(struct _viv_key_list_s *key_list,int command_index);
-static void _viv_key_list_copy(struct _viv_key_list_s *dst,const struct _viv_key_list_s *src);
-static void _viv_key_clear_all(struct _viv_key_list_s *list);
-static void _viv_key_list_init(struct _viv_key_list_s *list);
+static void _viv_key_add(_viv_key_list_t *key_list,int command_index,DWORD keyflags);
+static void _viv_key_clear(_viv_key_list_t *key_list,int command_index);
+static void _viv_key_list_copy(_viv_key_list_t *dst,const _viv_key_list_t *src);
+static void _viv_key_clear_all(_viv_key_list_t *list);
+static void _viv_key_list_init(_viv_key_list_t *list);
 static void _viv_options_key_list_sel_change(HWND hwnd,int previous_key_index);
 static void _viv_options_remove_key(HWND hwnd);
 static void _viv_options_edit_key(HWND hwnd,int key_index);
@@ -581,8 +586,8 @@ static LRESULT CALLBACK _viv_edit_key_edit_proc(HWND hwnd,UINT msg,WPARAM wParam
 static int _viv_get_current_key_mod_flags(void);
 static void _viv_options_edit_key_changed(HWND hwnd);
 static void _viv_edit_key_set_key(HWND hwnd,DWORD key_flags);
-static void _viv_key_remove(struct _viv_key_list_s *keylist,int command_index,DWORD keyflags);
-static void _viv_edit_key_remove_currently_used_by(struct _viv_key_list_s *keylist,DWORD keyflags);
+static void _viv_key_remove(_viv_key_list_t *keylist,int command_index,DWORD keyflags);
+static void _viv_edit_key_remove_currently_used_by(_viv_key_list_t *keylist,DWORD keyflags);
 static void _viv_close_existing_process(void);
 static void _viv_uninstall_delete_file(const wchar_t *path,const utf8_t *filename);
 static int _viv_is_start_menu_shortcuts(void);
@@ -684,8 +689,9 @@ static int _viv_view_y = 0; // the current image offset in pixels
 static double _viv_view_ix = 0.0; // the current image offset in percent, used when resizing the window
 static double _viv_view_iy = 0.0; // the current image offset in percent, used when resizing the window
 static int _viv_zoom_pos = 0; // the current zoom level
+static int _viv_wheel_zoom_accum = 0; // fractional WM_MOUSEWHEEL delta carried between zoom levels
 //static float _viv_zoom_presets[_VIV_ZOOM_MAX] = {0.004815f,0.019215f,0.043060f,0.076120f,0.118079f,0.168530f,0.226989f,0.292893f,0.365607f,0.444430f,0.528603f,0.617316f,0.709715f,0.804909f,0.901983f,1.000000f}; // (1 - cos(((float)(x+1) * 1.570796f) / _VIV_ZOOM_MAX)) // this is missing cos((1 * 1.570796f) / _VIV_ZOOM_MAX), which is too small
-static float _viv_zoom_presets[_VIV_ZOOM_MAX] = {0.0000,0.0100,0.0225,0.0379,0.0569,0.0806,0.1098,0.1461,0.1909,0.2465,0.3154,0.4007,0.5063,0.6372,0.7993,1.0000}; // 0.01 - 0.2 curve
+static float _viv_zoom_presets[_VIV_ZOOM_MAX] = {0.000000f,0.003333f,0.006833f,0.010508f,0.014367f,0.018419f,0.022673f,0.027140f,0.031830f,0.036755f,0.041926f,0.047356f,0.053057f,0.059043f,0.065329f,0.071929f,0.078858f,0.086135f,0.093775f,0.101797f,0.110220f,0.119064f,0.128351f,0.138102f,0.148340f,0.159090f,0.170378f,0.182230f,0.194675f,0.207742f,0.221463f,0.235869f,0.250996f,0.266879f,0.283556f,0.301068f,0.319454f,0.338760f,0.359032f,0.380317f,0.402666f,0.426140f,0.450780f,0.476653f,0.503819f,0.532267f,0.562213f,0.593657f}; // geometric curve: preset[i] = (pow(1.05,i) - 1) / 15, so each adjacent level is ~5% larger than the previous (scale = 1 + 15*preset[i] = 1.05^i)
 
 static ULONG_PTR os_GdiplusToken; // gdiplus handle
 static int _viv_image_wide = 0; // current image width
@@ -1124,12 +1130,12 @@ WORD _viv_context_menu_items[] =
 
 #define _VIV_CONEXT_MENU_ITEM_COUNT	(sizeof(_viv_context_menu_items) / sizeof(WORD))
 
-typedef struct _viv_key_list_s
+struct _viv_key_list_s
 {
 	config_key_t *start[_VIV_COMMAND_COUNT];
 	config_key_t *last[_VIV_COMMAND_COUNT];
 	
-}_viv_key_list_t;
+};
 
 _viv_key_list_t *_viv_key_list = 0;
 
@@ -1280,6 +1286,7 @@ static void _viv_clear(void)
 	_viv_frame_count = 0;
 	_viv_frame_loaded_count = 0;
 	_viv_zoom_pos = 0;
+	_viv_wheel_zoom_accum = 0;
 	_viv_view_x = 0;
 	_viv_view_y = 0;
 	_viv_view_ix = 0.0;
@@ -1676,6 +1683,7 @@ static void _viv_command_with_is_key_repeat(int command_id,int is_key_repeat)
 		case VIV_ID_VIEW_ZOOM_RESET:
 			_viv_1to1 = 0;
 			_viv_zoom_pos = 0;
+			_viv_wheel_zoom_accum = 0;
 			_viv_view_set(_viv_view_x,_viv_view_y,1);
 			InvalidateRect(_viv_hwnd,0,FALSE);
 			break;
@@ -2054,6 +2062,7 @@ static void _viv_command_with_is_key_repeat(int command_id,int is_key_repeat)
 			
 		case VIV_ID_VIEW_BESTFIT:
 			_viv_zoom_pos = 0;
+			_viv_wheel_zoom_accum = 0;
 			_viv_1to1 = 0;
 			_viv_view_set(0,0,1);
 			InvalidateRect(_viv_hwnd,0,FALSE);
@@ -14168,6 +14177,8 @@ static void _viv_do_mousewheel_action(int action,int delta,int x,int y)
 		{
 			_viv_1to1 = 0;
 			
+			_viv_wheel_zoom_accum = 0; // start fresh sub-notch accumulation after leaving 1:1
+			
 			if (delta > 0)
 			{
 				for(_viv_zoom_pos = 0;_viv_zoom_pos<_VIV_ZOOM_MAX;_viv_zoom_pos++)
@@ -14195,13 +14206,21 @@ static void _viv_do_mousewheel_action(int action,int delta,int x,int y)
 		}
 		else
 		{
-			if (delta > 0)
+			// Accumulate the raw WM_MOUSEWHEEL delta and only advance whole zoom
+			// levels once a full notch (_VIV_WHEEL_ZOOM_NOTCH = 120) has built up.
+			// High resolution wheels / trackpads send small deltas (e.g. +/-30 or
+			// +/-10); carrying the remainder stops a light nudge from jumping a
+			// whole zoom step at once.
+			int steps;
+			
+			_viv_wheel_zoom_accum += delta;
+			
+			steps = _viv_wheel_zoom_accum / _VIV_WHEEL_ZOOM_NOTCH;
+			_viv_wheel_zoom_accum -= steps * _VIV_WHEEL_ZOOM_NOTCH;
+			
+			if (steps)
 			{
-				_viv_zoom_pos++;
-			}
-			else
-			{
-				_viv_zoom_pos--;
+				_viv_zoom_pos += steps;
 			}
 		}
 		
