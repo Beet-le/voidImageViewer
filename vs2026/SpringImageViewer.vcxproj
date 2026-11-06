@@ -549,7 +549,7 @@
       <CompileAs>CompileAsC</CompileAs>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>ComCtl32.lib;shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>ComCtl32.lib;shlwapi.lib;Msimg32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)SpringImageViewer.exe</OutputFile>
       <AdditionalLibraryDirectories>C:\Program Files (x86)\Microsoft Visual Studio 8\VC\PlatformSDK\Lib\AMD64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -722,7 +722,7 @@
       <LinkLibraryDependencies>true</LinkLibraryDependencies>
     </ProjectReference>
     <Link>
-      <AdditionalDependencies>ComCtl32.lib;shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>ComCtl32.lib;shlwapi.lib;Msimg32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ShowProgress>NotSet</ShowProgress>
       <SubSystem>Windows</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>

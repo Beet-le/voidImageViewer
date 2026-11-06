@@ -1839,6 +1839,10 @@ static void _viv_command_with_is_key_repeat(int command_id,int is_key_repeat)
 		case VIV_ID_SLIDESHOW_PAUSE:
 			_viv_pause();
 			break;
+
+		case VIV_ID_SLIDESHOW_PLAY_PAUSE:
+			_viv_pause();
+			break;
 			
 		case VIV_ID_SLIDESHOW_RATE_DEC:
 			_viv_increase_rate(1);
@@ -11162,7 +11166,7 @@ static void _viv_controls_show(int show)
 			SendMessage(_viv_toolbar_hwnd,TB_SETEXTENDEDSTYLE,0,TBSTYLE_EX_MIXEDBUTTONS|TBSTYLE_EX_HIDECLIPPEDBUTTONS|TBSTYLE_EX_DOUBLEBUFFER);
 			SendMessage(_viv_toolbar_hwnd,TB_BUTTONSTRUCTSIZE,sizeof(TBBUTTON),0);
 			
-			_viv_toolbar_image_list = ImageList_Create((12 * os_logical_wide) / 96,(12 * os_logical_high) / 96,ILC_COLOR32,0,0);
+			_viv_toolbar_image_list = ImageList_Create((16 * os_logical_wide) / 96,(16 * os_logical_high) / 96,ILC_COLOR32,0,0);
 			
 			ImageList_AddIcon(_viv_toolbar_image_list,LoadIcon(os_hinstance,(LPCTSTR)IDI_PREV));
 			ImageList_AddIcon(_viv_toolbar_image_list,LoadIcon(os_hinstance,(LPCTSTR)IDI_PLAY));
@@ -11173,13 +11177,28 @@ static void _viv_controls_show(int show)
 
 			SendMessage(_viv_toolbar_hwnd,TB_SETIMAGELIST,0,(LPARAM)_viv_toolbar_image_list);
 
+			/* set button size and padding for a cleaner look */
 			{
-				TBBUTTON buttons[8];
-				wchar_t button_text[8][STRING_SIZE];
+				DWORD btnSize = MAKELONG(28, 26);
+				SendMessage(_viv_toolbar_hwnd,TB_SETBUTTONSIZE,0,btnSize);
+			}
+			{
+				TBMETRICS tbm;
+				os_zero_memory(&tbm,sizeof(TBMETRICS));
+				tbm.cbSize = sizeof(TBMETRICS);
+				tbm.dwMask = TBMF_BUTTONSPACING;
+				tbm.cxButtonSpacing = 2;
+				SendMessage(_viv_toolbar_hwnd,TB_SETMETRICS,0,(LPARAM)&tbm);
+			}
+
+			{
+				TBBUTTON buttons[7];
+				wchar_t button_text[7][STRING_SIZE];
 				int buttoni;
-				
+						
 				buttoni = 0;
-	
+			
+				/* prev button */
 				buttons[buttoni].iBitmap = 0;
 				buttons[buttoni].idCommand = VIV_ID_NAV_PREV;
 				buttons[buttoni].fsState = TBSTATE_ENABLED;
@@ -11187,7 +11206,8 @@ static void _viv_controls_show(int show)
 				string_copy_utf8_string(button_text[buttoni],localization_get_string(LOCALIZATION_ID_TOOLBAR_PREVIOUS_IMAGE_BUTTON));
 				buttons[buttoni].iString = (INT_PTR)button_text[buttoni];
 				buttoni++;
-				
+									
+				/* next button */
 				buttons[buttoni].iBitmap = 3;
 				buttons[buttoni].idCommand = VIV_ID_NAV_NEXT;
 				buttons[buttoni].fsState = TBSTATE_ENABLED;
@@ -11195,37 +11215,32 @@ static void _viv_controls_show(int show)
 				string_copy_utf8_string(button_text[buttoni],localization_get_string(LOCALIZATION_ID_TOOLBAR_NEXT_IMAGE_BUTTON));
 				buttons[buttoni].iString = (INT_PTR)button_text[buttoni];
 				buttoni++;
-	
+						
+				/* separator */
 				buttons[buttoni].iBitmap = 0;
 				buttons[buttoni].idCommand = 0;
 				buttons[buttoni].fsState = 0;
 				buttons[buttoni].fsStyle = TBSTYLE_SEP;
 				buttons[buttoni].iString = 0;
 				buttoni++;
-				
-				buttons[buttoni].iBitmap = 1;
-				buttons[buttoni].idCommand = VIV_ID_SLIDESHOW_PLAY_ONLY;
-				buttons[buttoni].fsState = TBSTATE_ENABLED;
-				buttons[buttoni].fsStyle = TBSTYLE_BUTTON|TBSTYLE_CHECK|TBSTYLE_GROUP;
+						
+				/* play/pause toggle button */
+				buttons[buttoni].iBitmap = _viv_is_slideshow ? 2 : 1;
+				buttons[buttoni].idCommand = VIV_ID_SLIDESHOW_PLAY_PAUSE;
+				buttons[buttoni].fsState = TBSTATE_ENABLED | (_viv_is_slideshow ? TBSTATE_CHECKED : 0);
+				buttons[buttoni].fsStyle = TBSTYLE_BUTTON|TBSTYLE_CHECK;
 				string_copy_utf8_string(button_text[buttoni],localization_get_string(LOCALIZATION_ID_TOOLBAR_PLAY_SLIDESHOW_BUTTON));
 				buttons[buttoni].iString = (INT_PTR)button_text[buttoni];
 				buttoni++;
-	
-				buttons[buttoni].iBitmap = 2;
-				buttons[buttoni].idCommand = VIV_ID_SLIDESHOW_PAUSE_ONLY;
-				buttons[buttoni].fsState = TBSTATE_ENABLED;
-				buttons[buttoni].fsStyle = TBSTYLE_BUTTON|TBSTYLE_CHECK|TBSTYLE_GROUP;
-				string_copy_utf8_string(button_text[buttoni],localization_get_string(LOCALIZATION_ID_TOOLBAR_PAUSE_SLIDESHOW_BUTTON));
-				buttons[buttoni].iString = (INT_PTR)button_text[buttoni];
-				buttoni++;
-	
+			
+				/* separator */
 				buttons[buttoni].iBitmap = 0;
 				buttons[buttoni].idCommand = 0;
 				buttons[buttoni].fsState = 0;
 				buttons[buttoni].fsStyle = TBSTYLE_SEP;
 				buttons[buttoni].iString = 0;
 				buttoni++;
-					
+							
 				buttons[buttoni].iBitmap = 4;
 				buttons[buttoni].idCommand = VIV_ID_VIEW_BESTFIT;
 				buttons[buttoni].fsState = TBSTATE_ENABLED;
@@ -11233,7 +11248,7 @@ static void _viv_controls_show(int show)
 				string_copy_utf8_string(button_text[buttoni],localization_get_string(LOCALIZATION_ID_TOOLBAR_BEST_FIT_BUTTON));
 				buttons[buttoni].iString = (INT_PTR)button_text[buttoni];
 				buttoni++;				
-					
+							
 				buttons[buttoni].iBitmap = 5;
 				buttons[buttoni].idCommand = VIV_ID_VIEW_1TO1;
 				buttons[buttoni].fsState = TBSTATE_ENABLED;
@@ -11241,8 +11256,8 @@ static void _viv_controls_show(int show)
 				string_copy_utf8_string(button_text[buttoni],localization_get_string(LOCALIZATION_ID_TOOLBAR_ACTUAL_SIZE_BUTTON));
 				buttons[buttoni].iString = (INT_PTR)button_text[buttoni];
 				buttoni++;
-					
-				SendMessage(_viv_toolbar_hwnd,TB_ADDBUTTONS,8,(LPARAM)buttons);
+							
+				SendMessage(_viv_toolbar_hwnd,TB_ADDBUTTONS,7,(LPARAM)buttons);
 			}
 
 			_viv_toolbar_update_buttons();
@@ -11643,14 +11658,95 @@ static LRESULT CALLBACK _viv_rebar_proc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM 
 						{
 							case NM_CUSTOMDRAW:
 							{
-								switch(((NMTBCUSTOMDRAW *)lParam)->nmcd.dwDrawStage)
+								NMTBCUSTOMDRAW *pnmcd = (NMTBCUSTOMDRAW *)lParam;
+								
+								switch(pnmcd->nmcd.dwDrawStage)
 								{
 									case CDDS_PREPAINT:	
 									{
 										RECT rect;
+										HDC hdc = pnmcd->nmcd.hdc;
+										
 										GetClientRect(_viv_toolbar_hwnd,&rect);
-										FillRect(((NMTBCUSTOMDRAW *)lParam)->nmcd.hdc,&rect,(HBRUSH)(COLOR_BTNFACE+1));
+										
+										/* subtle vertical gradient background */
+										{
+											TRIVERTEX vert[2];
+											GRADIENT_RECT gRect;
+											
+											vert[0].x = 0;
+											vert[0].y = 0;
+											vert[0].Red = 0xF0F0;
+											vert[0].Green = 0xF0F0;
+											vert[0].Blue = 0xF2F2;
+											vert[0].Alpha = 0;
+											
+											vert[1].x = rect.right;
+											vert[1].y = rect.bottom;
+											vert[1].Red = 0xE8E8;
+											vert[1].Green = 0xE8E8;
+											vert[1].Blue = 0xEBEB;
+											vert[1].Alpha = 0;
+											
+											gRect.UpperLeft = 0;
+											gRect.LowerRight = 1;
+											
+											GradientFill(hdc,vert,2,&gRect,1,GRADIENT_FILL_RECT_V);
+										}
+										
+										/* top highlight line */
+										{
+											RECT topLine;
+											topLine.left = 0;
+											topLine.top = 0;
+											topLine.right = rect.right;
+											topLine.bottom = 1;
+											FillRect(hdc,&topLine,(HBRUSH)(COLOR_3DHIGHLIGHT+1));
+										}
+										
 										return CDRF_NOTIFYITEMDRAW;
+									}
+									
+									case CDDS_ITEMPREPAINT:
+									{
+										/* let default draw happen, then we'll post-paint */
+										return CDRF_NOTIFYPOSTPAINT;
+									}
+									
+									case CDDS_ITEMPOSTPAINT:
+									{
+										/* draw a subtle border around hovered/checked buttons */
+										if (pnmcd->nmcd.uItemState & (CDIS_HOT | CDIS_CHECKED))
+										{
+											RECT btnRect;
+											HDC hdc = pnmcd->nmcd.hdc;
+											HPEN pen;
+											HPEN oldPen;
+											
+											btnRect = pnmcd->nmcd.rc;
+											
+											if (pnmcd->nmcd.uItemState & CDIS_CHECKED)
+											{
+												/* checked button: blue-ish border */
+												pen = CreatePen(PS_SOLID,1,RGB(100,149,237));
+											}
+											else
+											{
+												/* hot button: light blue border */
+												pen = CreatePen(PS_SOLID,1,RGB(173,216,230));
+											}
+											
+											oldPen = (HPEN)SelectObject(hdc,pen);
+											MoveToEx(hdc,btnRect.left,btnRect.top,NULL);
+											LineTo(hdc,btnRect.right-1,btnRect.top);
+											LineTo(hdc,btnRect.right-1,btnRect.bottom-1);
+											LineTo(hdc,btnRect.left,btnRect.bottom-1);
+											LineTo(hdc,btnRect.left,btnRect.top);
+											SelectObject(hdc,oldPen);
+											DeleteObject(pen);
+										}
+										
+										return CDRF_DODEFAULT;
 									}
 								}
 								
@@ -11839,16 +11935,11 @@ static void _viv_toolbar_update_buttons(void)
 		int rh;
 		
 		tbbinfo.cbSize = sizeof(TBBUTTONINFO);
-		tbbinfo.dwMask = TBIF_STATE;
+		tbbinfo.dwMask = TBIF_STATE | TBIF_IMAGE;
 		tbbinfo.fsState = _viv_is_slideshow ? (TBSTATE_ENABLED | TBSTATE_CHECKED) : (TBSTATE_ENABLED);
+		tbbinfo.iImage = _viv_is_slideshow ? 2 : 1;
 		
-		SendMessage(_viv_toolbar_hwnd,TB_SETBUTTONINFO,VIV_ID_SLIDESHOW_PLAY_ONLY,(LPARAM)&tbbinfo);
-		
-		tbbinfo.cbSize = sizeof(TBBUTTONINFO);
-		tbbinfo.dwMask = TBIF_STATE;
-		tbbinfo.fsState = _viv_is_slideshow ? (TBSTATE_ENABLED) : (TBSTATE_ENABLED | TBSTATE_CHECKED);
-		
-		SendMessage(_viv_toolbar_hwnd,TB_SETBUTTONINFO,VIV_ID_SLIDESHOW_PAUSE_ONLY,(LPARAM)&tbbinfo);
+		SendMessage(_viv_toolbar_hwnd,TB_SETBUTTONINFO,VIV_ID_SLIDESHOW_PLAY_PAUSE,(LPARAM)&tbbinfo);
 		
 		_viv_get_render_size(&rw,&rh);
 		
