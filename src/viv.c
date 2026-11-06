@@ -11166,14 +11166,23 @@ static void _viv_controls_show(int show)
 			SendMessage(_viv_toolbar_hwnd,TB_SETEXTENDEDSTYLE,0,TBSTYLE_EX_MIXEDBUTTONS|TBSTYLE_EX_HIDECLIPPEDBUTTONS|TBSTYLE_EX_DOUBLEBUFFER);
 			SendMessage(_viv_toolbar_hwnd,TB_BUTTONSTRUCTSIZE,sizeof(TBBUTTON),0);
 			
-			_viv_toolbar_image_list = ImageList_Create((16 * os_logical_wide) / 96,(16 * os_logical_high) / 96,ILC_COLOR32,0,0);
+			_viv_toolbar_image_list = ImageList_Create(16,16,ILC_COLOR32,6,0);
 			
-			ImageList_AddIcon(_viv_toolbar_image_list,LoadIcon(os_hinstance,(LPCTSTR)IDI_PREV));
-			ImageList_AddIcon(_viv_toolbar_image_list,LoadIcon(os_hinstance,(LPCTSTR)IDI_PLAY));
-			ImageList_AddIcon(_viv_toolbar_image_list,LoadIcon(os_hinstance,(LPCTSTR)IDI_PAUSE));
-			ImageList_AddIcon(_viv_toolbar_image_list,LoadIcon(os_hinstance,(LPCTSTR)IDI_NEXT));
-			ImageList_AddIcon(_viv_toolbar_image_list,LoadIcon(os_hinstance,(LPCTSTR)IDI_BESTFIT));
-			ImageList_AddIcon(_viv_toolbar_image_list,LoadIcon(os_hinstance,(LPCTSTR)IDI_1TO1));
+			{
+				HICON icon;
+				icon = LoadImage(os_hinstance,MAKEINTRESOURCE(IDI_PREV),IMAGE_ICON,16,16,0);
+				ImageList_AddIcon(_viv_toolbar_image_list,icon ? icon : LoadIcon(NULL,IDI_QUESTION));
+				icon = LoadImage(os_hinstance,MAKEINTRESOURCE(IDI_PLAY),IMAGE_ICON,16,16,0);
+				ImageList_AddIcon(_viv_toolbar_image_list,icon ? icon : LoadIcon(NULL,IDI_QUESTION));
+				icon = LoadImage(os_hinstance,MAKEINTRESOURCE(IDI_PAUSE),IMAGE_ICON,16,16,0);
+				ImageList_AddIcon(_viv_toolbar_image_list,icon ? icon : LoadIcon(NULL,IDI_QUESTION));
+				icon = LoadImage(os_hinstance,MAKEINTRESOURCE(IDI_NEXT),IMAGE_ICON,16,16,0);
+				ImageList_AddIcon(_viv_toolbar_image_list,icon ? icon : LoadIcon(NULL,IDI_QUESTION));
+				icon = LoadImage(os_hinstance,MAKEINTRESOURCE(IDI_BESTFIT),IMAGE_ICON,16,16,0);
+				ImageList_AddIcon(_viv_toolbar_image_list,icon ? icon : LoadIcon(NULL,IDI_QUESTION));
+				icon = LoadImage(os_hinstance,MAKEINTRESOURCE(IDI_1TO1),IMAGE_ICON,16,16,0);
+				ImageList_AddIcon(_viv_toolbar_image_list,icon ? icon : LoadIcon(NULL,IDI_QUESTION));
+			}
 
 			SendMessage(_viv_toolbar_hwnd,TB_SETIMAGELIST,0,(LPARAM)_viv_toolbar_image_list);
 
